@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <title>Coding Resources</title>
+  </head>
+
+  <body class="bg-white min-h-screen text-slate-800">
+    <div class="max-w-6xl mx-auto px-6 py-10">
+      <h1 class=" text-green-600 text-3xl font-semibold text-center mb-8">Coding Resources.</h1>
+      <hr>
+
+      <div
+        id="result"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+      ></div>
+
+      <h2 class="text-red-600 text-2xl font-semibold mt-12 mb-6">Favorites</h2>
+
+      <div
+        id="favorites"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+      ></div>
+    </div>
+
+    
+    <script>
+ let apiResponse = [];
+
+let favData = JSON.parse(localStorage.getItem("data")) || [];
+
+const getData = async () => {
+    try {
+
+        apiResponse = await fetch("https://api.sampleapis.com/codingresources/codingResources");
+
+        apiResponse = await apiResponse.json();
+
+        console.log(apiResponse);
+
+        let resultEl = document.getElementById("result");
+
+        resultEl.innerHTML = "";
+
+        apiResponse.map(
+            (eachdata) =>
+                (resultEl.innerHTML += `
+                    <div class="bg-white p-5 rounded-lg shadow-sm">
+
+                        <h3 class="font-bold">${eachdata.description}</h3>
+
+                        <p>Topics: ${eachdata.topics}</p>
+
+                        <p>Levels: ${eachdata.levels}</p>
+
+                        <a href="${eachdata.url}" target="_blank">Resource Link</a>
+
+                        <button class="bg-yellow-500 px-5 py-2 cursor-pointer rounded-md"
+                        onclick='addToFav(${JSON.stringify(eachdata)})'>
+                            Add to Favorites
+                        </button>
+
+                    </div>
+                `)
+        );
+
+    } catch (error) {
+        console.log(error);
+        alert("Error occured");
+    }
+};
+
+getData();
+
+const addToFav = (eachdata) => {
+
+    let isExist = favData.find(
+        (data) => data.description === eachdata.description
+    );
+
+    if (isExist) {
+        alert("Already added to Favorites");
+    } else {
+
+        favData.unshift(eachdata);
+
+        let jsonData = JSON.stringify(favData);
+
+        localStorage.setItem("data", jsonData);
+
+        showFavData();
+    }
+};
+
+const showFavData = () => {
+
+    let resultEl = document.getElementById("favorites");
+
+    resultEl.innerHTML = "";
+
+    favData.map(
+        (eachdata) =>
+            (resultEl.innerHTML += `
+                <div class="bg-white p-5 rounded-lg shadow-sm">
+
+                    <h3 class="font-bold">${eachdata.description}</h3>
+
+                    <p>Topics: ${eachdata.topics}</p>
+
+                    <p>Levels: ${eachdata.levels}</p>
+
+                    <button onclick="deleteData('${eachdata.description}')"
+                    class="bg-red-500 text-white px-5 py-2 rounded-md">
+                        Remove
+                    </button>
+
+                </div>
+            `)
+    );
+};
+
+showFavData();
+
+const deleteData = (ddescription) => {
+
+    let filteredData = favData.filter(
+        (eachdata) => eachdata.description !== ddescription
+    );
+
+    favData = filteredData;
+
+    localStorage.setItem("data", JSON.stringify(favData));
+
+    showFavData();
+};
+
+
+
+    </script>
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 3.Display Favorites section 
+Show Favorite resources in a seperate Favorite section. Favorites must remain visible after page refresh. Each favorite item should display: Description,Topics Remove button. -->
